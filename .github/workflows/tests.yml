@@ -1,0 +1,30 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Fonts (DejaVu Sans is matplotlib's default)
+        run: sudo apt-get update && sudo apt-get install -y fonts-dejavu-core fontconfig
+      - name: Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-deps inkex==1.4.0
+          pip install "lxml<7" numpy pillow tinycss2 cssselect pyparsing packaging pytest
+      - name: inkscape-1.4 branch regression tests
+        run: python -m pytest -v extras/tests/inkscape14
+      - name: Upstream Scaler and Combine by Color comparisons
+        working-directory: extras/tests
+        run: python -m pytest -v test_main.py -k "Scale or CBC"

@@ -1,0 +1,5 @@
+__pycache__/
+# Written next to the scripts or in the working directory at run time
+Log.txt
+scientific_inkscape/favorite_markers.settings
+scientific_inkscape/si_temp/

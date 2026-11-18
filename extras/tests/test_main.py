@@ -39,6 +39,7 @@ testflattenflow     = True;
 testflattenrest     = True; 
 testflattenpapers   = True; 
 testscalecorrection = True;
+testscalefixed      = True;
 testscalecorrection2= True;
 testscalematching   = True;
 testghoster         = True;

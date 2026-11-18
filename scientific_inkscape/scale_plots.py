@@ -238,7 +238,12 @@ class ScalePlots(inkex.EffectExtension):
 
         self.options.tickthr = self.options.tickthreshold / 100
         # layerfix = self.options.layerfix
-        if self.options.tab == "matching":
+        if self.options.tab == "scaling":
+            # Fixed mode: scale each plot area by a fixed percentage
+            self.options.hmatch = self.options.vmatch = False
+            self.options.matchxpos = self.options.matchypos = False
+            self.options.wholesel = self.options.wholeplot1
+        elif self.options.tab == "matching":
             self.options.hmatch = self.options.hmatchopts in [2, 3]
             self.options.vmatch = self.options.vmatchopts in [2, 3]
             self.options.matchxpos = self.options.hmatchopts == 3
@@ -275,7 +280,7 @@ class ScalePlots(inkex.EffectExtension):
         self.gbbs = {k: geometric_bbox(k, v).sbb for k, v in self.fbbs.items()}
 
         self.firstsel = sel[0]
-        if not cmode:
+        if self.options.tab == "matching":
             plots = sel[1:]
         else:
             plots = sel[:]
@@ -291,14 +296,14 @@ class ScalePlots(inkex.EffectExtension):
         for i, _ in enumerate(plots):  # sel in asel:
             self.scale_plot(i, cmode)
 
-        if not cmode and self.options.deletematch:
+        if self.options.tab == "matching" and self.options.deletematch:
             self.firstsel.delete()
 
     def scale_plot(self, i, cmode=True):
         """
         Scale an individual grouped plot
         cmode = True: Correction mode
-        cmode = False: Matching mode
+        cmode = False: Matching mode, or Fixed mode when the tab is "scaling"
         """
         if not cmode:
             # If in matching mode and plot has a transform, correct first
@@ -406,6 +411,12 @@ class ScalePlots(inkex.EffectExtension):
                     # what refx needs to be to maintain top-left
                 else:
                     refy = tr_bba.f.y1 + dyl
+        elif self.options.tab == "scaling":
+            fbbs2 = self.fbbs
+            gbbs2 = self.gbbs
+            bbmatch = None
+            scalex = self.options.hscale / 100
+            scaley = self.options.vscale / 100
         else:
             fbbs2 = self.fbbs
             gbbs2 = self.gbbs
@@ -450,7 +461,7 @@ class ScalePlots(inkex.EffectExtension):
 
         finx = refx  # final x
         finy = refy  # final y
-        if not cmode:
+        if not cmode and self.options.tab == "matching":
             if self.options.matchxpos:
                 finx = bbmatch.xc
             if self.options.matchypos:

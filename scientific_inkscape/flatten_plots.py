@@ -331,9 +331,16 @@ class FlattenPlots(inkex.EffectExtension):
                                     myp.insert(myi, nt)
                                     nt.text = chr(0x2212)  # minus sign
                                     nt.ctransform = (-myp.ccomposed_transform) @ t0
-                                    nt.set("x", str(19.3964))
+                                    # The path is DejaVu Sans's U+2212 glyph
+                                    # (matplotlib's default font) in 1000-unit
+                                    # em space, so at x=0 that font's minus
+                                    # covers it exactly. A generic sans-serif
+                                    # is narrower in most fonts (Noto Sans,
+                                    # Arial), which left a gap that Merge
+                                    # nearby text then turned into a space.
+                                    nt.set("x", "0")
                                     nt.set("y", str(626.924))
-                                    nt.cstyle = "font-size:999.997; font-family:sans-serif; fill:{0};".format(
+                                    nt.cstyle = "font-size:999.997; font-family:'DejaVu Sans',sans-serif; fill:{0};".format(
                                         sf.fill
                                     )
 

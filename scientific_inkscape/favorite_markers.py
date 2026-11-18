@@ -272,7 +272,7 @@ class FavoriteMarkers(inkex.EffectExtension):
         pars.add_argument(
             "--emarker", type=inkex.Boolean, default=False, help="End marker?"
         )
-        pars.add_argument("--size", type=float, default=100, help="Size (%)")
+        pars.add_argument("--size", type=float, default=100, help="Size (%%)")
 
         pars.add_argument(
             "--addt", type=inkex.Boolean, default=True, help="Add template?"
