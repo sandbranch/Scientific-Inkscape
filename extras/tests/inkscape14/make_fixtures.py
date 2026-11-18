@@ -5,7 +5,9 @@ Regenerate the matplotlib fixtures used by test_inkscape14.py.
 
 mpl_pdf_import.svg: a two-panel matplotlib figure saved as PDF and opened
     with Inkscape 1.4.3's internal PDF importer.
-mpl_grouped.svg: that import run through the Flattener (default options,
+mpl_svg_text.svg: the same figure saved by matplotlib as SVG with
+    svg.fonttype 'none' (text kept as text, user unit = 1 pt).
+mpl_grouped.svg: the PDF import run through the Flattener (default options,
     every child of the layer selected), then each panel's elements put in
     a group (plotL, plotR), as the README asks before running the Scaler.
 """
@@ -49,6 +51,8 @@ def main():
     fig.tight_layout()
     pdf = os.path.join(HERE, "mpl.pdf")
     fig.savefig(pdf)
+    with matplotlib.rc_context({"svg.fonttype": "none"}):
+        fig.savefig(os.path.join(HERE, "mpl_svg_text.svg"))
 
     imp = os.path.join(HERE, "mpl_pdf_import.svg")
     inkscape(pdf, "--export-type=svg", "--export-filename=" + imp)

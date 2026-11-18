@@ -26,6 +26,7 @@ import inkex  # noqa: E402
 
 IMPORT = os.path.join(HERE, "mpl_pdf_import.svg")
 GROUPED = os.path.join(HERE, "mpl_grouped.svg")
+SVGTEXT = os.path.join(HERE, "mpl_svg_text.svg")
 MINUS = "−"
 
 
@@ -222,6 +223,23 @@ def test_flattener_same_text_in_all_unit_systems(tmp_path, units):
         )
 
     assert texts(out) == texts(ref)
+
+
+def test_flattener_keeps_matplotlib_svg_mathtext_words(tmp_path):
+    """Matplotlib's own SVG with svg.fonttype 'none' (what upstream advises
+    for scaling) writes mathtext one glyph per tspan, with newlines between
+    them. Flattening kept the collapsed spaces: "A m p l i t u d e",
+    "s i n ( x )", visibly spaced out in the result."""
+    out = run(FlattenPlots, ["--id=figure_1"], SVGTEXT, tmp_path)
+    svg = inkex.load_svg(out).getroot()
+    texts = [
+        "".join(t.itertext()) for t in svg.descendants() if isinstance(t, inkex.TextElement)
+    ]
+    for want in ("sin(x)", "cos(x)", "Time (s)", "Oscillation", "x \u00d7 10"):
+        assert want in texts
+    assert any(t.startswith("Amplitude") for t in texts)
+    spaced = [t for t in texts if re.search(r"\w \w \w", t)]
+    assert not spaced
 
 
 # ---------------------------------------------------------- Favorite Markers

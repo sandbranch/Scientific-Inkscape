@@ -1,7 +1,8 @@
-> **sandbranch `inkscape-1.4` branch.** Upstream Scientific Inkscape v1.4.26 plus three fixes, tested on Inkscape 1.4.3 (Linux, Python 3.14), where it works without needing 1.4.4:
+> **sandbranch `inkscape-1.4` branch.** Upstream Scientific Inkscape v1.4.26 plus four fixes, tested on Inkscape 1.4.3 (Linux, Python 3.14), where it works without needing 1.4.4:
 >
 > - **Scaler, Fixed mode** (`--tab=scaling`) did nothing since upstream's Scaler refactor (45be6ca): it silently marked the selected plots scale-free instead. Fixed mode is restored and again matches upstream's own reference output for it.
 > - **Flattener** turned matplotlib's path minus sign back into a character in generic sans-serif, which is narrower than the DejaVu Sans glyph it replaces on most systems, so "Merge nearby text" produced "&minus; 1.0" with a space. The minus is now set in DejaVu Sans (falling back to sans-serif), which covers the original path exactly.
+> - **Flattener** spaced out matplotlib's own SVG text (`svg.fonttype: none`, the setting recommended for scaling): mathtext such as `$\sin(x)$` puts each glyph in its own tspan with newlines between them, and the merged result read "s i n ( x )". Those collapsed spaces, which the next glyph is drawn over, are now dropped. This change leaves the Flattener output for all 11 upstream test drawings byte-identical.
 > - **Favorite Markers** did not start on Python 3.14 (bare `%` in an argparse help string).
 >
 > Regression tests: `python3 -m pytest extras/tests/inkscape14` (run in CI on Python 3.10 to 3.14).

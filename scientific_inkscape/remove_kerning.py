@@ -439,6 +439,7 @@ def Remove_Manual_Kerning(els, mergesupersub):
     for ptxt in ptxts:
         if ptxt.lns is not None:
             chks += ptxt.chks
+    phantom = []  # (chunk, number of trailing spaces covered by the next chunk)
     for w in chks:
         mw = []
         w2 = w.nextw
@@ -469,8 +470,26 @@ def Remove_Manual_Kerning(els, mergesupersub):
                 
             if validmerge:
                 mw.append([w2, "same", br1, bl2])
+                # Matplotlib's SVG mathtext (svg.fonttype 'none') puts every
+                # glyph in its own absolutely positioned tspan, with newlines
+                # between the tspans that SVG collapses to one space each.
+                # Each glyph is drawn on top of the space before it, so the
+                # spaces never show, but merging kept them: "s i n ( x )".
+                # Drop trailing spaces that come from whitespace between
+                # elements (tails) when the next chunk starts where they do.
+                if (
+                    trl_spcs
+                    and all(c.loc.typ == tp.TYP_TAIL for c in w.chrs[-trl_spcs:])
+                    and abs(bl2[0] - (br1[0] - trl_spcs * w.spw)) < 0.5 * w.spw
+                ):
+                    phantom.append((w, trl_spcs))
 
         w.mw = mw
+
+    for w, nsp in phantom:
+        for _ in range(nsp):
+            if w.chrs and w.chrs[-1].c == " ":
+                w.chrs[-1].delc()
 
     Perform_Merges(chks, mk=True)
 
